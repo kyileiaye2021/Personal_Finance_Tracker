@@ -69,5 +69,51 @@ def set_budget(category, amount):
     with open('Data/budgets.json', 'w') as file: # open the file to update the json file with new budget amount
         json.dump(budget_dict, file)
 
+def calculate_total_monthly_expense(month): #month format: YYYY-MM
+    '''
+    Calculate the total monthly expense for the month given by user
+    Parameter:
+    month('str'): the month that the user want the total expenses for 
+    '''
+    transactions = load_transaction()
+    total_expense = 0.0
+    for transaction in transactions:
+        date, category, amount, transaction_type = transaction
+        if (transaction_type == 'Expense' or transaction_type == 'expense') and date.startswith(month):
+            total_expense += amount
+    return total_expense
+
+def check_budget_status(month): #month format: YYYY-MM
+    '''
+    Check the user's expenses for given month is above or under budget amount
+    '''
+    transactions = load_transaction() # list loaded by the transactions.csv file to extract total expenses of the given month
+    budgets = load_budget() # dict loaded by the budgets.json file to extract the budget amount and the category type
+    
+    expenses_by_category = {} # {category : total_amount_expenses} to store the total amount expenses for specific category for given month
+    for transaction in transactions:
+        date, category, amount, transaction_type = transaction
+        # extracting the expense amount based on the expense transaction type and month given by user
+        if (transaction_type == 'Expense' or transaction_type == 'expense') and date.startswith(month):
+            if category not in expenses_by_category:
+                expenses_by_category[category] = 0.0
+            else:
+                expenses_by_category[category] += amount
+    
+    budget_status = {} # to store the budget status, expenses, budget, and remaining for specific category
+    
+    # check if the expense of each category is under or above budget
+    for expense_category, expense_amount in expenses_by_category.items():
+        budget = budgets[expense_category] # extracting the budget amount of each expense_category in budgets.json file
+        if expense_amount <= budget:
+            status = 'under'
+            remaining = budget - expense_amount
+        else:
+            status = 'over'
+            remaining = expense_amount - budget
+        budget_status[expense_category] = (status, expense_amount, budget, remaining)
+        
+    return budget_status
+        
 if __name__ == '__main__':
     main()
