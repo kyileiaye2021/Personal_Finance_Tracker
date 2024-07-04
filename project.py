@@ -1,5 +1,6 @@
 #main functions and other functions will be implemented
 import csv
+import json
 
 def main():
     print("Welcome To Personal Finance Tracker")
@@ -44,8 +45,29 @@ def load_transaction():
         
     return transaction_lst
 
-def func3():
-    pass
+def load_budget():
+    '''
+    Loading budget from the json file
+    return dictionary
+    '''
+    try:
+        with open('Data/budgets.json', 'r') as file: # open the file and read the file
+            budgets = json.load(file) 
+    except FileNotFoundError:
+        budgets = {} 
+    return budgets
+
+def set_budget(category, amount):
+    '''
+    Set the monthly budget for each category
+    Parameter
+    category(str): the category that the user want to set budget for
+    amount(float): the amount that the user want to set budget for
+    '''
+    budget_dict = load_budget() #load the budget from the json file (return as a dict)
+    budget_dict[category] = amount # update the budget amount in specific category
+    with open('Data/budgets.json', 'w') as file: # open the file to update the json file with new budget amount
+        json.dump(budget_dict, file)
 
 if __name__ == '__main__':
     main()
