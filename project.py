@@ -1,15 +1,22 @@
 #main functions and other functions will be implemented
 import csv
 import json
+from collections import defaultdict
 
 def main():
     print("Welcome To Personal Finance Tracker")
-    '''
-    add_transaction('2023-06-10', 'Food', 40, 'Expense')
     transactions = load_transaction()
-    last_transaction = transactions[-1]
-    print(last_transaction)
-    '''
+    print("Before checking budget")
+    print(transactions)
+    print("Checking Budget")
+    status = check_budget_status("2023-06")
+    print(status)
+    
+    add_transaction('2023-06-10', 'Food', 40, 'Expense')
+    add_transaction("2023-06-22","Clothes", 50, "Expense")
+    transactions = load_transaction()
+    print("After checking budget")
+    print(transactions)
     
 def add_transaction(date, category, amount, transaction_type):
     '''
@@ -38,7 +45,9 @@ def load_transaction():
         with open('Data/transactions.csv', 'r') as file:
             reader = csv.reader(file) #create an obj to read data from the file
             next(reader) #skip the header row 
-            transaction_lst = list(reader) #assign the list of transaction from the csv file
+            for row in reader:
+                if row:
+                    transaction_lst.append(row)
             
     except FileNotFoundError:
         print("Transaction File Not Found")
@@ -50,10 +59,11 @@ def load_budget():
     Loading budget from the json file
     return dictionary
     '''
+    
     try:
         with open('Data/budgets.json', 'r') as file: # open the file and read the file
             budgets = json.load(file) 
-    except FileNotFoundError:
+    except json.JSONDecodeError: #when testing, this error pops up because json file doesn't exist at first.
         budgets = {} 
     return budgets
 
@@ -80,7 +90,7 @@ def calculate_total_monthly_expense(month): #month format: YYYY-MM
     for transaction in transactions:
         date, category, amount, transaction_type = transaction
         if (transaction_type == 'Expense' or transaction_type == 'expense') and date.startswith(month):
-            total_expense += amount
+            total_expense += float(amount)
     return total_expense
 
 def check_budget_status(month): #month format: YYYY-MM
@@ -90,21 +100,19 @@ def check_budget_status(month): #month format: YYYY-MM
     transactions = load_transaction() # list loaded by the transactions.csv file to extract total expenses of the given month
     budgets = load_budget() # dict loaded by the budgets.json file to extract the budget amount and the category type
     
-    expenses_by_category = {} # {category : total_amount_expenses} to store the total amount expenses for specific category for given month
+    #default dict is used with all values initialized to 0 
+    expenses_by_category = defaultdict(lambda: 0.0) # {category : total_amount_expenses} to store the total amount expenses for specific category for given month
     for transaction in transactions:
         date, category, amount, transaction_type = transaction
         # extracting the expense amount based on the expense transaction type and month given by user
         if (transaction_type == 'Expense' or transaction_type == 'expense') and date.startswith(month):
-            if category not in expenses_by_category:
-                expenses_by_category[category] = 0.0
-            else:
-                expenses_by_category[category] += amount
+            expenses_by_category[category] += float(amount)
     
     budget_status = {} # to store the budget status, expenses, budget, and remaining for specific category
     
     # check if the expense of each category is under or above budget
     for expense_category, expense_amount in expenses_by_category.items():
-        budget = budgets[expense_category] # extracting the budget amount of each expense_category in budgets.json file
+        budget = budgets.get(expense_category, 0.0) # extracting the budget amount of each expense_category in budgets.json file
         if expense_amount <= budget:
             status = 'under'
             remaining = budget - expense_amount
@@ -112,7 +120,7 @@ def check_budget_status(month): #month format: YYYY-MM
             status = 'over'
             remaining = expense_amount - budget
         budget_status[expense_category] = (status, expense_amount, budget, remaining)
-        
+    
     return budget_status
         
 if __name__ == '__main__':
