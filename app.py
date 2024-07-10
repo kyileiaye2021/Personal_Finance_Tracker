@@ -10,11 +10,11 @@ def index():
 @app.route('/add_transaction', methods=['POST', 'GET'])
 def add_transaction_route():
     if request.method == 'POST':
-        data = request.form['data']
+        date = request.form['date']
         category = request.form['category']
         amount = float(request.form['amount'])
         transaction_type = request.form['transaction_type']
-        add_transaction(data, category, amount, transaction_type)
+        add_transaction(date, category, amount, transaction_type)
     return render_template('add_transactions.html')
 
 @app.route('/set_budget', methods=['POST', 'GET'])
