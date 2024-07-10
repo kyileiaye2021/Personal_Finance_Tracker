@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template()
+    return render_template('index.html')
 
 @app.route('/add_transaction', methods=['POST', 'GET'])
 def add_transaction_route():
@@ -29,8 +29,9 @@ def set_budget_route():
 def report():
     if request.method == 'POST':
         month = request.form['month']
-        generate_report(month)
-    return render_template('report.html')
+        report_data = generate_report(month) #generate_report() func returns list of transaction 
+        return render_template('report.html', report = report_data, month = month) #passing report data and month var to the report.html template
+    return render_template('report.html', report=None)
 
 @app.route('/check_budget_status', methods=['GET', 'POST'])
 def check_budget_status_route():

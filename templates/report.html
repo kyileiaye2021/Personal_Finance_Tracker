@@ -1,1 +1,25 @@
 {%extends 'base.html'%}
+
+{%block content%}
+<h1>Generate Report</h1>
+<form method="POST">
+    <label for='month'>Month (YYYY-MM):</label>
+    <input type="text" name="month" id="month" required>
+    <button type='submit'>Generate Report</button>
+</form>
+
+<!--display of report data-->
+{% if report%} <!--check the report is empty or none -->
+
+    <h2>Report for {{ month }}</h2>
+
+    <ul>
+
+        {% for transction in report%} <!--iterates over each transaction in report list-->
+        <li>{{ transaction }}</li> <!--For each transaction, create a list and display-->
+        {% endfor %} <!--end the for loop-->
+
+    </ul>
+
+{% endif %} <!--end the if loop-->
+{%endblock%}

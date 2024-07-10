@@ -79,7 +79,7 @@ def set_budget(category, amount):
     with open('Data/budgets.json', 'w') as file: # open the file to update the json file with new budget amount
         json.dump(budget_dict, file)
         
-def generate_report(month):
+def generate_report(month) -> list:
     report_lst = []
     transactions = load_transaction()
     for t in transactions:
