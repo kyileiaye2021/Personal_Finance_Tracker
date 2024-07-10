@@ -46,7 +46,7 @@ def load_transaction():
             reader = csv.reader(file) #create an obj to read data from the file
             next(reader) #skip the header row 
             for row in reader:
-                if row:
+                if row: #skip the empty line in the file
                     transaction_lst.append(row)
             
     except FileNotFoundError:
@@ -78,7 +78,15 @@ def set_budget(category, amount):
     budget_dict[category] = amount # update the budget amount in specific category
     with open('Data/budgets.json', 'w') as file: # open the file to update the json file with new budget amount
         json.dump(budget_dict, file)
-
+        
+def generate_report(month):
+    report_lst = []
+    transactions = load_transaction()
+    for t in transactions:
+        if t[0].startswith(month): #t[0] refers to first column which is date
+            report_lst.append(t)
+    return report_lst
+    
 def calculate_total_monthly_expense(month): #month format: YYYY-MM
     '''
     Calculate the total monthly expense for the month given by user
