@@ -1,6 +1,6 @@
-{%extends "base.html"%}
+{% extends "base.html" %}
 
-{%block content%}
+{% block content %}
 <h1>Budget Status</h1>
 
 <form method="POST">
@@ -11,7 +11,6 @@
 
 {% if status %}
     <h2> Budget Status for {{ month }}</h2>
-
     <ul>
         {% for item_category, data in status.items() %}
             <li>Category: {{item_category}}, Status: {{data[0]}}, Spent: ${{data[1]}}, Budget: ${{data[2]}},  

@@ -1,6 +1,6 @@
-{%extends "base.html"%} <!--inherited from base.html-->
+{% extends "base.html" %} <!--inherited from base.html-->
 
-{%block content%} <!--filling content block-->
+{% block content %} <!--filling content block-->
 <h1>Add Transaction</h1>
 <form method="POST"> <!--form tag is used for getting user input with POST method-->
     <!--id attribute from input tag and for attribute from label must match -->
@@ -20,4 +20,4 @@
     </select>
     <button type="submit">Add Transaction</button>
 </form>
-{%endblock%}
+{% endblock %}

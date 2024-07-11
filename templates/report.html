@@ -1,6 +1,6 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
 
-{%block content%}
+{% block content %}
 <h1>Generate Report</h1>
 <form method="POST">
     <label for='month'>Month (YYYY-MM):</label>
@@ -16,10 +16,10 @@
     <ul>
 
         {% for transaction in report%} <!--iterates over each transaction in report list-->
-            <li>Date: {{ transaction[0] }}, Category: {{transaction[1]}}, Amount: ${{transaction[2]}}, Transaction_type: {{transaction[3]}} </li> <!--For each transaction, create a list and display-->
+            <li>Date: {{ transaction[0] }}, Category: {{ transaction[1] }}, Amount: ${{ transaction[2] }}, Transaction_type: {{ transaction[3] }} </li> <!--For each transaction, create a list and display-->
         {% endfor %} <!--end the for loop-->
 
     </ul>
 
 {% endif %} <!--end the if loop-->
-{%endblock%}
+{% endblock %}

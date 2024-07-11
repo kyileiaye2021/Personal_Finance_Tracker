@@ -4,19 +4,24 @@
     <head>
         <meta charset="utf-8">
         <title>Personal Finance Tracker</title>
-        <link rel="stylesheet" href='{{url_for('static', filename='css/styles.css')}}'>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     </head>
     <body>
         <nav>
             <ul>
-                <li><a ref= "{{ url_for('index') }}">Home</a></li>
-                <li><a ref= "{{ url_for('add_transaction_route') }}">Add Transactions</a></li>
-                <li><a ref= "{{ url_for('set_budget_route') }}">Set Budgets</a></li>
-                <li><a ref= "{{ url_for('report') }}">Generate Monthly Report</a></li>
-                <li><a ref= "{{ url_for('check_budget_status_route') }}">Check Budget Status</a></li>
+                <li><a href= "{{ url_for('index') }}">Home</a></li>
+                <li><a href= "{{ url_for('add_transaction_route') }}">Add Transactions</a></li>
+                <li><a href= "{{ url_for('set_budget_route') }}">Set Budgets</a></li>
+                <li><a href= "{{ url_for('report') }}">Generate Monthly Report</a></li>
+                <li><a href= "{{ url_for('check_budget_status_route') }}">Check Budget Status</a></li>
             </ul>
         </nav>
 
-        {%block content%}{% endblock%} <!--blank that will be filled in children templates-->
+        {% block content %}{% endblock %} <!--blank that will be filled in children templates-->
+
+        <footer>
+            <p>Author: Kyi Lei Aye</p>
+        </footer>
+
     </body>
 </html>

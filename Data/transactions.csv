@@ -1,5 +1,4 @@
 date, category, amount, transaction_type
-
 2024-06-10,Food,40,Expense
 2024-06-20,Food,20,Expense
 2024-06-04,Clothes,200,Expense
@@ -8,3 +7,4 @@ date, category, amount, transaction_type
 2024-06-20,Food,20,Expense
 2024-06-04,Clothes,200,Expense
 2024-06-24,Grocery,8.99,Expense
+2023-09-10,Grocery,30.0,expense
