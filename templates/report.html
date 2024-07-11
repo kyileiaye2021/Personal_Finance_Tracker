@@ -15,8 +15,8 @@
 
     <ul>
 
-        {% for transction in report%} <!--iterates over each transaction in report list-->
-            <li>{{ transaction }}</li> <!--For each transaction, create a list and display-->
+        {% for transaction in report%} <!--iterates over each transaction in report list-->
+            <li>Date: {{ transaction[0] }}, Category: {{transaction[1]}}, Amount: {{transaction[2]}}, Transaction_type: {{transaction[3]}} </li> <!--For each transaction, create a list and display-->
         {% endfor %} <!--end the for loop-->
 
     </ul>

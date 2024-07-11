@@ -9,11 +9,11 @@
     <body>
         <nav>
             <ul>
-                <li><a ref= '{{url_for('index')}}'></li>
-                <li><a ref= '{{url_for('add_transaction_route')}}'></li>
-                <li><a ref= '{{url_for('set_budget_route')}}'></li>
-                <li><a ref= '{{url_for('report')}}'></li>
-                <li><a ref= '{{url_for('check_budget_status_route')}}'></li>
+                <li><a ref= "{{ url_for('index') }}">Home</a></li>
+                <li><a ref= "{{ url_for('add_transaction_route') }}">Add Transactions</a></li>
+                <li><a ref= "{{ url_for('set_budget_route') }}">Set Budgets</a></li>
+                <li><a ref= "{{ url_for('report') }}">Generate Monthly Report</a></li>
+                <li><a ref= "{{ url_for('check_budget_status_route') }}">Check Budget Status</a></li>
             </ul>
         </nav>
 
