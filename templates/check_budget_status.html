@@ -9,14 +9,20 @@
     <button type='submit'>Check Budget Status</button>
 </form>
 
-{%if status%}
+{% if status %}
     <h2> Budget Status for {{ month }}</h2>
 
     <ul>
-        {%for item_category, data in status.items()%}
-            <li>Category {{item_category}}: Status {{data[0]}} Spent {{data[1]}} Budget {{data[2]}} Remaining {{data[3]}} </li>
-        {%endfor%}
+        {% for item_category, data in status.items() %}
+            <li>Category: {{item_category}}, Status: {{data[0]}}, Spent: ${{data[1]}}, Budget: ${{data[2]}},  
+                {% if data[0] == 'Under'%}
+                    Remaining ${{data[3]}} </li>
+                {% endif %}
+                {% if data[0] == 'Over' %}
+                    Amount Over ${{data[3]}} </li>
+                {% endif %}
+        {% endfor %}
     </ul>
-{%endif%}
+{% endif %}
 
-{%endblock%}
+{% endblock %}

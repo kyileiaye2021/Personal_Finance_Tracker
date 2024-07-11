@@ -122,10 +122,10 @@ def check_budget_status(month) -> dict: #month format: YYYY-MM
     for expense_category, expense_amount in expenses_by_category.items():
         budget = budgets.get(expense_category, 0.0) # extracting the budget amount of each expense_category in budgets.json file
         if expense_amount <= budget:
-            status = 'under'
+            status = 'Under'
             remaining = budget - expense_amount
         else:
-            status = 'over'
+            status = 'Over'
             remaining = expense_amount - budget
         budget_status[expense_category] = (status, expense_amount, budget, remaining)
     
