@@ -37,8 +37,9 @@ def report():
 def check_budget_status_route():
     if request.method == 'POST':
         month = request.form['month']
-        check_budget_status(month)
-    return render_template('check_budget_status.html')
+        budget_status = check_budget_status(month) #check_budget_status() func returns dict of {status, expense, budget, remaining/over}
+        return render_template('check_budget_status.html', status = budget_status, month = month)
+    return render_template('check_budget_status.html', status = None)
         
 if __name__ == '__main__':
     app.run(debug=True)

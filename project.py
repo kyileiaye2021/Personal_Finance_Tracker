@@ -101,7 +101,7 @@ def calculate_total_monthly_expense(month): #month format: YYYY-MM
             total_expense += float(amount)
     return total_expense
 
-def check_budget_status(month): #month format: YYYY-MM
+def check_budget_status(month) -> dict: #month format: YYYY-MM
     '''
     Check the user's expenses for given month is above or under budget amount
     '''
