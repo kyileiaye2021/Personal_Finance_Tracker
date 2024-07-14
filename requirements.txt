@@ -9,3 +9,9 @@ packaging==24.1
 pluggy==1.5.0
 pytest==8.2.2
 Werkzeug==3.0.3
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Flask-WTF
+WTForms
+email_validator

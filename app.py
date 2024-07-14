@@ -1,3 +1,4 @@
+import email_validator
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
@@ -40,8 +41,8 @@ def load_user(user_id):
 class RegistrationForm(FlaskForm): #inherited from FlaskForm class which is for creating forms in Flask-WTF
     username = StringField('Username', validators=[DataRequired(),Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = StringField('Password', validators=[DataRequired()])
-    confirm_password = StringField('Confirm Password', validators=[DataRequired(), EqualTo(password)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo(password)])
     submit = SubmitField('Sign Up')
     
     def validate_username(self, username):
@@ -76,7 +77,7 @@ def register():
         db.session.commit() #saving the new user to the database
         flash('Your account has been created!', 'success') #printing out message
         return redirect(url_for('login')) #After registering, the login page will be redirected
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form) 
 
 # creating route for login page
 @app.route('/login', methods=['GET', 'POST'])
@@ -86,20 +87,30 @@ def login():
     
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(emai=form.email.data).first() #check the user is in the database. return the first username in the database
-        if user and check_password_hash(user.password, form.password.data): #check if the email exists and the password in the database is the same as provided password in login
-            login_user(user) #logs the user in by creating a session for them. It sets the user ID in the session and tracks the user's authentication status
-            return redirect(url_for('index')) #redirect to homepage after loggin in
-        else:
-            flash('Login Unsuccessful. Please check email and password.', 'danger')
-        return render_template('login.html', form=form)
+        user = User.query.filter_by(email=form.email.data).first() #check the user is in the database. return the first username in the database
+        if user: #if user exists
+            
+            if check_password_hash(user.password, form.password.data): #check if the email exists and the password in the database is the same as provided password in login
+                login_user(user) #logs the user in by creating a session for them. It sets the user ID in the session and tracks the user's authentication status
+                return redirect(url_for('index')) #redirect to homepage after loggin in
+            else:
+                flash('Login Unsuccessful. Please check email and password.', 'danger')
+        
+        else: #if username doesn't exist
+            flash('No account found with that email. Please register first.', 'warning')
+            return redirect(url_for('register'))
+        
+    return render_template('login.html', form=form)
     
+#creating route for homepage
 @app.route('/')
-@login_required
+@login_required #login is required before reaching to this
 def index():
     return render_template('index.html')
 
+#creating route for add_transaction page
 @app.route('/add_transaction', methods=['POST', 'GET'])
+@login_required
 def add_transaction_route():
     if request.method == 'POST':
         date = request.form['date']
@@ -110,7 +121,9 @@ def add_transaction_route():
         return redirect(url_for('index'))
     return render_template('add_transactions.html')
 
+#creating route for set_budget page
 @app.route('/set_budget', methods=['POST', 'GET'])
+@login_required
 def set_budget_route():
     if request.method == 'POST':
         category = request.form['category']
@@ -119,7 +132,9 @@ def set_budget_route():
         return redirect(url_for('index'))
     return render_template('set_budget.html')
 
+#creating route for report page
 @app.route('/report', methods = ['POST', 'GET'])
+@login_required
 def report():
     if request.method == 'POST':
         month = request.form['month']
@@ -127,7 +142,9 @@ def report():
         return render_template('report.html', report = report_data, month = month) #passing report data and month var to the report.html template
     return render_template('report.html', report=None)
 
+#creating route for check budget_status page
 @app.route('/check_budget_status', methods=['GET', 'POST'])
+@login_required
 def check_budget_status_route():
     if request.method == 'POST':
         month = request.form['month']
