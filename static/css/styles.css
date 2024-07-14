@@ -6,6 +6,10 @@ h1, h2 {
 nav {
     background-color: #333;
     padding: 1em;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    position: relative;
 }
 
 nav ul {
@@ -27,10 +31,12 @@ nav ul li a {
     padding: 0.5em 1em;
     background-color: #444;
     border-radius: 4px;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 nav ul li a:hover {
     background-color: #555;
+    transform: scale(1.1);
 }
 
 body {
@@ -38,6 +44,9 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 form {
@@ -45,14 +54,36 @@ form {
     margin: 2em auto;
     padding: 1em;
     background-color: white;
-    border-radius: 4px;
+    border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-label, input, select, button {
+label {
+    margin-bottom: 0.5em;
+    font-weight: bold;
+}
+
+input, select, button {
     display: block;
     width: 100%;
     margin-bottom: 1em;
+    padding: 0.5em;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
 }
 
 .container {
@@ -64,17 +95,50 @@ label, input, select, button {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-p{
+p {
     text-align: center;
     font-size: 1.5em;
     font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
+
 footer {
     background-color: #333;
     color: white;
     text-align: center;
     padding: 1em;
-    position: absolute;
+    position: relative;
     bottom: 0;
     width: 100%;
+    margin-top: auto;
+}
+
+.flashes {
+    max-width: 600px;
+    margin: 2em auto;
+    padding: 1em;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.flash {
+    padding: 1em;
+    margin-bottom: 1em;
+    border-radius: 4px;
+    color: black;
+}
+
+.flash.success {
+    background-color: #4caf50;
+}
+
+.flash.danger {
+    background-color: #f44336;
+}
+
+.flash.warning {
+    background-color: #ff9800;
+}
+
+.flash.info {
+    background-color: #2196f3;
 }

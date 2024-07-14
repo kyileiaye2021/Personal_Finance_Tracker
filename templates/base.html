@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     </head>
     <body>
+
         <nav>
             <ul>
                 <li><a href= "{{ url_for('index') }}">Home</a></li>
@@ -28,9 +29,9 @@
         <!--captures all flash messages in a var named messages-->
         {% with messages = get_flashed_messages(with_categories=true) %} <!--each message will come with its associated category (e.g., 'success', 'danger', 'warning')-->
         {% if messages %}
-                <ul>
+                <ul class="flashes">
                     {% for category, message in messages%}
-                        <li class="{{ category }}">{{ message }}</li>
+                        <li class="flash {{ category }}">{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -39,6 +40,7 @@
         {% block content %}{% endblock %} <!--blank that will be filled in children templates-->
 
         <footer>
+            <p>&copy; 2024 Personal Finance Tracker. All rights reserved.</p>
             <p>Author: <i>Kyi Lei Aye</i></p>
         </footer>
 

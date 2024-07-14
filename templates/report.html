@@ -1,25 +1,29 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Generate Report</h1>
-<form method="POST">
-    <label for='month'>Month (YYYY-MM):</label>
-    <input type="text" name="month" id="month" required>
-    <button type='submit'>Generate Report</button>
-</form>
+<div class='container'>
 
-<!--display of report data-->
-{% if report%} <!--check the report is empty or none -->
+    <h2>Generate Report</h2>
+    <form method="POST">
+        <label for='month'>Month (YYYY-MM):</label>
+        <input type="text" name="month" id="month" required>
+        <button type='submit'>Generate Report</button>
+    </form>
 
-    <h2>Report for {{ month }}</h2>
+    <!--display of report data-->
+    {% if report%} <!--check the report is empty or none -->
 
-    <ul>
+        <h2>Report for {{ month }}</h2>
 
-        {% for transaction in report%} <!--iterates over each transaction in report list-->
-            <li>Date: {{ transaction[0] }}, Category: {{ transaction[1] }}, Amount: ${{ transaction[2] }}, Transaction_type: {{ transaction[3] }} </li> <!--For each transaction, create a list and display-->
-        {% endfor %} <!--end the for loop-->
+        <ul>
 
-    </ul>
+            {% for transaction in report%} <!--iterates over each transaction in report list-->
+                <li>Date: {{ transaction[0] }}, Category: {{ transaction[1] }}, Amount: ${{ transaction[2] }}, Transaction_type: {{ transaction[3] }} </li> <!--For each transaction, create a list and display-->
+            {% endfor %} <!--end the for loop-->
 
-{% endif %} <!--end the if loop-->
+        </ul>
+
+    {% endif %} <!--end the if loop-->
+</div>
+
 {% endblock %}
