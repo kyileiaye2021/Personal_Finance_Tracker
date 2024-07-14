@@ -23,6 +23,18 @@
                 {% endif %}
             </ul>
         </nav>
+        
+        <!--Making flash messages (login error and sucess messages) to display-->
+        <!--captures all flash messages in a var named messages-->
+        {% with messages = get_flashed_messages(with_categories=true) %} <!--each message will come with its associated category (e.g., 'success', 'danger', 'warning')-->
+        {% if messages %}
+                <ul>
+                    {% for category, message in messages%}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
 
         {% block content %}{% endblock %} <!--blank that will be filled in children templates-->
 
