@@ -42,7 +42,7 @@ class RegistrationForm(FlaskForm): #inherited from FlaskForm class which is for 
     username = StringField('Username', validators=[DataRequired(),Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo(password)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
     
     def validate_username(self, username):
@@ -101,7 +101,14 @@ def login():
             return redirect(url_for('register'))
         
     return render_template('login.html', form=form)
-    
+
+#creating route for logout
+@app.route('/logout')
+def logout():
+    logout_user() #logout the user
+    flash('You have been logged out.','info')
+    return redirect(url_for('login'))
+
 #creating route for homepage
 @app.route('/')
 @login_required #login is required before reaching to this

@@ -14,6 +14,13 @@
                 <li><a href= "{{ url_for('set_budget_route') }}">Set Budgets</a></li>
                 <li><a href= "{{ url_for('report') }}">Generate Monthly Report</a></li>
                 <li><a href= "{{ url_for('check_budget_status_route') }}">Check Budget Status</a></li>
+
+                {% if current_user.is_authenticated %} <!--only show logout button if the user is already login -->
+                    <li><a href= "{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href= "{{ url_for('login') }}">Sign In</a></li> <!--only show login and register button if the user isn't logged in-->
+                    <li><a href= "{{ url_for('register') }}">Register</a></li>
+                {% endif %}
             </ul>
         </nav>
 
