@@ -1,0 +1,39 @@
+<!--register page-->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+
+    <h2>Register</h2>
+
+    <form method="POST"> <!--starts the form | the method="POST" attribute specifies that the form will submit data using the POST method.--> 
+        {{ form.hidden_tag() }} <!--This generates a hidden field containing a CSRF token for protection against Cross-Site Request Forgery attacks-->
+
+        <div> <!--Username field-->
+            {{ form.username.label }}<br> <!--label for username field-->
+            {{ form.username(class="form-control") }} <!--renders username input field with form-control CSS class applied-->
+        </div>
+        
+        <div>
+            {{ form.email.label }}<br> <!--label for email field-->
+            {{ form.email(class="form-control") }} <!--renders email input field with form-control CSS class-->
+        </div>
+
+        <div>
+            {{ form.password.label }}<br> <!--label for password field-->
+            {{ form.password(class="form-control") }} <!--password input field with form-control css class-->
+        </div>
+
+        <div>
+            {{ form.confirm_password.label }}<br> <!--label for confirm password field-->
+            {{ form.confirm_password(class="form-control") }} <!--confirm password input field with form-control css-->
+        </div>
+
+        <div>
+            {{ form.submit(class="bth btn-primary") }} <!--renders submit button with btn and btn-primary css classes-->
+        </div>
+    </form>
+
+</div>
+{% endblock %}
+
