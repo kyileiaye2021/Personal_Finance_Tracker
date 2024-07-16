@@ -8,7 +8,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
 from project import add_transaction, set_budget, check_budget_status, generate_report
-import joblib # to load ml models
+#import joblib # to load ml models
 
 #initialize he flask application
 app = Flask(__name__)
@@ -26,7 +26,7 @@ db = SQLAlchemy(app) #create an instance of SQLAlchemy class, which interacts wi
 login_manager = LoginManager(app) #initialize loginManager instance linked to flask application
 login_manager.login_view = 'login' #set the view function to be called for users who need to login. This means if a user tries to access a route that requires authentication, they will be redirected to the 'login' view
 
-openai.api_key = 'your_openai_api_key'  #set the openai api key for authentication
+openai.api_key = 'secret_key'  #set the openai api key for authentication
 
 #define User model which represents user table in database
 class User(db.Model, UserMixin): #User class inherits from db.Model and UserMixin - making it a model in SQLAlchemy
@@ -169,6 +169,7 @@ def ai_advice():
     user_input = request.json.get('input') #get the value associated with the key 'input' from the JSON data sent in the POST request
     response = openai.Completion.create( #call open ai api to get completion based on the user input
         model="text-davinci-003", #specify the model to use
+        temperature = 0.5, # a number between 0 and 1 with higher numbers being more random. Higher numbers may be more creative, but they also make the results less predictable.
         prompt=f"Provide financial advice based on the following input: {user_input}", #construct the prompt to provide financial advice
         max_token=150 #Limit the response length
     )

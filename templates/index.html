@@ -4,9 +4,36 @@
     <h1>Welcome to Personal Finance Tracker!</h1>
     
     <p>
-        <i>Looking for a great tool to track of monthly expenses and budgets? Check out our Personal Finance Tracker!</i>
+        <i>Have question concerning Finance? Wanna get advice for budgets and expenses? Ask our financial advisor!</i>
     </p>
-    <h2AI Financial Advisor></h2>
-        
+    <h2>AI Financial Advisor</h2> <!--Getting user input prompt-->
+    <form id="ai-form">
+        <label for="ai_input">Enter your question or description: </label>
+        <input type="text" id="ai_input" name="ai_input" required> <!--The id attribute uniquely identifies the input field, allowing it to be accessed by JavaScript-->
+        <button type="submit">Get Advice</button>
+    </form>
+
+    <div id="ai_response" style="margin-top: 1em;"></div> <!--a container for displaying the AI generated advice-->
+
+    <script>
+        document.getElementById('ai-form').addEventListener('submit', function(event)){
+            event.preventDefault(); //prevent the default reloading page after getting the form input
+            const userInput = document.getElementById('ai-input').value; //retrieve the value entered in the input field with the ID 'ai_input' and store it in the var 
+
+            fetch('/ai_advice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ input: userInput }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const responseDiv = document.getElementById('ai_response');
+                responseDiv.innerHTML = `<p>Advice: ${data.advice}</p>`;
+            });
+
+        });
+    </script>
 </div>
 {% endblock %}
