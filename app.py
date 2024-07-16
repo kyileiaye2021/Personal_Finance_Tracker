@@ -1,5 +1,6 @@
+import openai #lib for interacting with openai api
 import email_validator
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
 from flask_wtf import FlaskForm #for creating forms in Flask-WTF
@@ -7,6 +8,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
 from project import add_transaction, set_budget, check_budget_status, generate_report
+import joblib # to load ml models
 
 #initialize he flask application
 app = Flask(__name__)
@@ -23,6 +25,8 @@ db = SQLAlchemy(app) #create an instance of SQLAlchemy class, which interacts wi
 #set up flask login manager for managing user sessions
 login_manager = LoginManager(app) #initialize loginManager instance linked to flask application
 login_manager.login_view = 'login' #set the view function to be called for users who need to login. This means if a user tries to access a route that requires authentication, they will be redirected to the 'login' view
+
+openai.api_key = 'your_openai_api_key'  #set the openai api key for authentication
 
 #define User model which represents user table in database
 class User(db.Model, UserMixin): #User class inherits from db.Model and UserMixin - making it a model in SQLAlchemy
@@ -159,5 +163,20 @@ def check_budget_status_route():
         return render_template('check_budget_status.html', status = budget_status, month = month)
     return render_template('check_budget_status.html', status = None)
         
+@app.route('/ai_advice', methods=['POST'])
+@login_required
+def ai_advice():
+    user_input = request.json.get('input') #get the value associated with the key 'input' from the JSON data sent in the POST request
+    response = openai.Completion.create( #call open ai api to get completion based on the user input
+        model="text-davinci-003", #specify the model to use
+        prompt=f"Provide financial advice based on the following input: {user_input}", #construct the prompt to provide financial advice
+        max_token=150 #Limit the response length
+    )
+    advice = response.choices[0].text.strip() #extract the text of the first choice completion from API response and removes any leading whitespaces
+    return jsonify({"advice": advice}) #return the advice as a JSON response
+
 if __name__ == '__main__':
     app.run(debug=True)
+    
+    
+    
