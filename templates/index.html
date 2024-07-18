@@ -8,7 +8,7 @@
     </p>
     <h2>AI Financial Advisor</h2> <!--Getting user input prompt-->
     <form id="ai-form">
-        <label for="ai_input">Enter your question or description: </label>
+        <label for="ai_input">Enter your question or description: </label> <!-- The for attribute is linked to the id of the input field (ai_input), ensuring accessibility and usability.-->
         <input type="text" id="ai_input" name="ai_input" required> <!--The id attribute uniquely identifies the input field, allowing it to be accessed by JavaScript-->
         <button type="submit">Get Advice</button>
     </form>
@@ -16,24 +16,39 @@
     <div id="ai_response" style="margin-top: 1em;"></div> <!--a container for displaying the AI generated advice-->
 
     <script>
-        document.getElementById('ai-form').addEventListener('submit', function(event)){
-            event.preventDefault(); //prevent the default reloading page after getting the form input
-            const userInput = document.getElementById('ai-input').value; //retrieve the value entered in the input field with the ID 'ai_input' and store it in the var 
+        function handleFormSubmit(event){
+            event.preventDefault(); //prevent the default form submission behavior, which would cause a page reload
+            const userInput = document.getElementById('ai_input').value; //access the value of ai_input id input field
 
-            fetch('/ai_advice', {
-                method: 'POST',
+            //fetch API used to make HTTP requests in Javascript
+            //sends a request to a server endpoint ('/ai_advice') to process user input and retrieve AI-generated advice
+            fetch('/ai_advice', { //initiates the fectch request to ai_advice endpoint
+                method: 'POST', //specifies the HTTP POST method to be used for the request
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json' //tells the server that request body contains data in JSON format
                 },
-                body: JSON.stringify({ input: userInput }),
+                body: JSON.stringify({ input: userInput}) //defines the body of the request, which is the data being sent to the server
+                //JSON.stringify: Converts a JavaScript object into a JSON string. This is necessary because the body of a POST request must be a string.
+            }) //here this point, the server processes the request and sends back a JSON response 
+            .then(response => response.json()) //parsed obj from the 'fetch' request
+            .then(data => {//parsed JSON data from prev .then method
+                //display the AI generated response in ai_response container
+                const responseContainer = document.getElementById('ai_response');
+                if (data.error){
+                    responseContainer.innerHTML = `<p>Error: ${data.error}</p>`;
+                }
+                else {
+                    responseContainer.innerHTML = `<p>Advice: ${data.advice}</p>`;
+                }
             })
-            .then(response => response.json())
-            .then(data => {
-                const responseDiv = document.getElementById('ai_response');
-                responseDiv.innerHTML = `<p>Advice: ${data.advice}</p>`;
+            .catch(error => {
+                const responseContainer = document.getElementById('ai_response');
+                responseContainer.innerHTML = `<p>Error: ${error.message}</p>`;
             });
+            
+        }
 
-        });
+        document.getElementById('ai-form').addEventListener("submit", handleFormSubmit); //attach the func to the form's submit event
     </script>
 </div>
 {% endblock %}
