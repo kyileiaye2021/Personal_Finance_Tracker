@@ -8,7 +8,8 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
 from project import add_transaction, set_budget, check_budget_status, generate_report
-#import joblib # to load ml models
+from dotenv import load_dotenv
+import os
 
 #initialize he flask application
 app = Flask(__name__)
@@ -26,7 +27,8 @@ db = SQLAlchemy(app) #create an instance of SQLAlchemy class, which interacts wi
 login_manager = LoginManager(app) #initialize loginManager instance linked to flask application
 login_manager.login_view = 'login' #set the view function to be called for users who need to login. This means if a user tries to access a route that requires authentication, they will be redirected to the 'login' view
 
-openai.api_key = 'secret_key'  #set the openai api key for authentication
+load_dotenv()
+openai.api_key = os.getenv('OPENAI_API_KEY')  #set the openai api key for authentication
 
 #define User model which represents user table in database
 class User(db.Model, UserMixin): #User class inherits from db.Model and UserMixin - making it a model in SQLAlchemy
@@ -162,20 +164,28 @@ def check_budget_status_route():
         budget_status = check_budget_status(month) #check_budget_status() func returns dict of {status, expense, budget, remaining/over}
         return render_template('check_budget_status.html', status = budget_status, month = month)
     return render_template('check_budget_status.html', status = None)
-        
+  
 @app.route('/ai_advice', methods=['POST'])
 @login_required
 def ai_advice():
     user_input = request.json.get('input') #get the value associated with the key 'input' from the JSON data sent in the POST request
-    response = openai.Completion.create( #call open ai api to get completion based on the user input
-        model="text-davinci-003", #specify the model to use
-        temperature = 0.5, # a number between 0 and 1 with higher numbers being more random. Higher numbers may be more creative, but they also make the results less predictable.
-        prompt=f"Provide financial advice based on the following input: {user_input}", #construct the prompt to provide financial advice
-        max_token=150 #Limit the response length
-    )
-    advice = response.choices[0].text.strip() #extract the text of the first choice completion from API response and removes any leading whitespaces
-    return jsonify({"advice": advice}) #return the advice as a JSON response
-
+    if not user_input:
+        return jsonify({"error": "No input provided"}), 400
+    
+    try:
+        response = openai.chat.completions.create( #call open ai api to get completion based on the user input
+            model="gpt-3.5-turbo", #specify the model to use
+            messages=[
+                {"role": "system", "content":"You are a financial advisor."},
+                {"role": "user", "content": user_input}
+            ],
+            #max_tokens=150, #Limit the response length
+            temperature = 0.5  # a number between 0 and 1 with higher numbers being more random. Higher numbers may be more creative, but they also make the results less predictable.
+        )
+        advice = response.choices[0].message.content#extract the text of the first choice completion from API response and removes any leading whitespaces
+        return jsonify({"advice": advice}) #return the advice as a JSON response
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True)
     

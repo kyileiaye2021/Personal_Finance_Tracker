@@ -56,4 +56,5 @@ A personal finance tracker built with python, flask, and Large Language Model.
    
 ### Reference
 1. https://www.youtube.com/watch?v=0jz1m3x2J5
+2. https://platform.openai.com/docs/guides/chat-completions/overview
    
