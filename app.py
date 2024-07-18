@@ -21,6 +21,7 @@ import matplotlib
 
 matplotlib.use('Agg') #use the 'Agg' backend for non-GUI rendering
 
+
 #initialize he flask application
 app = Flask(__name__)
 
@@ -261,6 +262,7 @@ def report():
 def check_budget_status_route():
     if request.method == 'POST':
         month = request.form['month']
+
         year, month = map(int, month.split('-'))
         
         #Query the budgets for the current user and the specified month and year
@@ -299,6 +301,7 @@ def check_budget_status_route():
     
     return render_template('check_budget_status.html', status=None)
 
+
 @app.route('/ai_advice', methods=['POST'])
 @login_required
 def ai_advice():
@@ -320,7 +323,9 @@ def ai_advice():
         return jsonify({"advice": advice}) #return the advice as a JSON response
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
     
+
 if __name__ == '__main__':
     app.run(debug=True)
     
