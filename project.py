@@ -124,9 +124,11 @@ def check_budget_status(month) -> dict: #month format: YYYY-MM
         if expense_amount <= budget:
             status = 'Under'
             remaining = budget - expense_amount
+            remaining = round(remaining, 2)
         else:
             status = 'Over'
             remaining = expense_amount - budget
+            remaining = round(remaining, 2)
         budget_status[expense_category] = (status, expense_amount, budget, remaining)
     
     return budget_status
