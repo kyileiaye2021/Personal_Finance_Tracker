@@ -53,6 +53,14 @@ A personal finance tracker built with python, flask, and Large Language Model.
 2. pytest
 3. json
 4. defaultdict from collection
+5. Flask, render_template, request, redirect, url_for, flash, jsonify from flask
+6. SQLAlchemy from flask_sqlalchemy
+7. LoginManager, UserMixin, login_user, current_user, logout_user, login_required from flask_login
+8. FlaskForm from flask_wtf
+9. StringField, PasswordField, SubmitField from wtforms
+10. DataRequired, Length, Email, EqualTo, ValidationError from wtforms.validators
+11. generate_password_hash, check_password_hash from werkzeug.security
+12. load_env from dotenv
    
 ### Reference
 1. https://www.youtube.com/watch?v=0jz1m3x2J5
