@@ -246,7 +246,7 @@ def report():
             expenses_by_category = defaultdict(lambda: 0.0) # {categories: total_amount_spent}
             for entry in report_data:
                 if entry[3] == 'expense' or entry[3] == 'Expense':
-                    expenses_by_category[entry[1]] += float(entry[2])
+                    expenses_by_category[entry[1]] += float(entry[2]) #need to convert to float because the amount values are saved as 'str' in csv file
            
 
             categories = list(expenses_by_category.keys())
