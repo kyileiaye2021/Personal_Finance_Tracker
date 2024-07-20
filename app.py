@@ -170,7 +170,7 @@ def report():
             expenses_by_category = defaultdict(lambda: 0.0) # {categories: total_amount_spent}
             for entry in report_data:
                 if entry[3] == 'expense' or entry[3] == 'Expense':
-                    expenses_by_category[entry[1]] += float(entry[2])
+                    expenses_by_category[entry[1]] += float(entry[2]) #need to convert to float because the amount values are saved as 'str' in csv file
            
             categories = list(expenses_by_category.keys())
             amounts = list(expenses_by_category.values())
@@ -178,16 +178,16 @@ def report():
             
             #Generate a pie chart of expenses by category         
             fig, ax = plt.subplots()
-            ax.pie(amounts, labels=categories, autopct='%1.1f%%')
+            ax.pie(amounts, labels=categories, autopct='%1.1f%%') #amounts represents the size of the pie slice, label represents the category name for each slice, and autopct displays the percent on the pie chart 
             ax.axis('equal') #Equal aspect ratio ensures that pie is drawn as a circle.
             
             #Save it to a temporary buffer
-            buf = io.BytesIO()
-            fig.savefig(buf, format='png')
-            buf.seek(0)
+            buf = io.BytesIO() #creates an in-memory binary stream (buffer) where image will be saved | buffer acts like a file but it exists only in memory
+            fig.savefig(buf, format='png') #save the image to the buffer as png format
+            buf.seek(0) #sets the buffer's current position to the beginning | important: because after writing to the buffer, the position will be at the end of the data
             
             #Embed the result in the html output
-            image = base64.b64encode(buf.getvalue()).decode('utf8')
+            image = base64.b64encode(buf.getvalue()).decode('utf8') #encode the buffer's content in Base64 and convert it to a UTF-8 string
             
             return render_template('report.html', report = report_data, month = month, image = image) #passing report data and month var to the report.html template
         
