@@ -34,6 +34,7 @@
                 </tr>
             </thread>
 
+
             <tbody> <!--body content in HTML table-->
                 {% for transaction in report %}
                 <tr>
@@ -48,6 +49,13 @@
         {% else %}
         <p>No transactions for the selected month</p>
         {% endif %}
+
+       <div class= "image-container"><!--Display the pie chart-->
+        <h3>Expense by Category</h3>
+        <img src= "data:image/png;base64,{{ image }}" alt="Expenses by Category">
+       </div>
+        <ul>
+
 
     {% endif %}
 </div>

@@ -16,7 +16,13 @@ import io
 import base64
 import logging
 from collections import defaultdict
+
 from datetime import datetime
+import matplotlib
+
+matplotlib.use('Agg') #use the 'Agg' backend for non-GUI rendering
+
+
 import matplotlib
 
 matplotlib.use('Agg') #use the 'Agg' backend for non-GUI rendering
@@ -214,6 +220,7 @@ def report():
     try:
         if request.method == 'POST':
             month = request.form['month']
+
             year, month = map(int, month.split('-'))
             
             transactions = Transaction.query.filter( #quries the Transaction model for transactions that match the specified month and year
@@ -231,12 +238,24 @@ def report():
                     expenses_by_category[transaction.category] += float(transaction.amount) #need to convert to float because the amount values are saved as 'str' in csv file
            
            #prepare data for visualization
+
+            report_data = generate_report(month) #generate_report() func returns list of transaction 
+            logging.debug(f'Report data: {report_data}')
+            
+            #aggregate expenses by category
+            expenses_by_category = defaultdict(lambda: 0.0) # {categories: total_amount_spent}
+            for entry in report_data:
+                if entry[3] == 'expense' or entry[3] == 'Expense':
+                    expenses_by_category[entry[1]] += float(entry[2])
+           
+
             categories = list(expenses_by_category.keys())
             amounts = list(expenses_by_category.values())
             logging.debug(f'Categories: {categories}, Amounts: {amounts}')
             
             #Generate a pie chart of expenses by category         
             fig, ax = plt.subplots()
+
             ax.pie(amounts, labels=categories, autopct='%1.1f%%') #amounts represents the size of the pie slice, label represents the category name for each slice, and autopct displays the percent on the pie chart 
             ax.axis('equal') #Equal aspect ratio ensures that pie is drawn as a circle.
             
@@ -249,6 +268,7 @@ def report():
             image = base64.b64encode(buf.getvalue()).decode('utf8') #encode the buffer's content in Base64 and convert it to a UTF-8 string
             
             return render_template('report.html', report = transactions, year = year, month = month, image = image) #passing report data and month var to the report.html template
+
         
     except Exception as e:
         logging.error(f"Error generating report: {e}")
@@ -324,7 +344,10 @@ def ai_advice():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
     
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
