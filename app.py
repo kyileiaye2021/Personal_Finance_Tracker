@@ -2,6 +2,7 @@ import openai #lib for interacting with openai api
 import email_validator
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
 from flask_wtf import FlaskForm #for creating forms in Flask-WTF
 from wtforms import StringField, PasswordField, SubmitField
@@ -26,10 +27,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key' #secret key is used by flask to encrypt session data and protect against certain types of attack
 
 #configure the database URI for SQLAlchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL','sqlite:///site.db') #modify the database to use PostgreSQL database provided by heroku
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL') #modify the database to use PostgreSQL database provided by heroku
 
 #initialize the database using SQLAlchemy
 db = SQLAlchemy(app) #create an instance of SQLAlchemy class, which interacts with the database
+migrate = Migrate(app, db)
 
 #set up flask login manager for managing user sessions
 login_manager = LoginManager(app) #initialize loginManager instance linked to flask application
