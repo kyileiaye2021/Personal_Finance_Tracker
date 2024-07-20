@@ -26,7 +26,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key' #secret key is used by flask to encrypt session data and protect against certain types of attack
 
 #configure the database URI for SQLAlchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db' #configure the location of database
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL','sqlite:///site.db') #modify the database to use PostgreSQL database provided by heroku
 
 #initialize the database using SQLAlchemy
 db = SQLAlchemy(app) #create an instance of SQLAlchemy class, which interacts with the database
