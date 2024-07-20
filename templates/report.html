@@ -15,6 +15,10 @@
 
         <h2>Report for {{ month }}</h2>
 
+       <div class= "image-container"><!--Display the pie chart-->
+        <h3>Expense by Category</h3>
+        <img src= "data:image/png;base64,{{ image }}" alt="Expenses by Category">
+       </div>
         <ul>
 
             {% for transaction in report%} <!--iterates over each transaction in report list-->

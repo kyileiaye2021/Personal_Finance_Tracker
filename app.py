@@ -10,6 +10,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from project import add_transaction, set_budget, check_budget_status, generate_report
 from dotenv import load_dotenv
 import os
+import matplotlib.pyplot as plt
+import io
+import base64
+import logging
+from collections import defaultdict
+import matplotlib
+
+matplotlib.use('Agg') #use the 'Agg' backend for non-GUI rendering
 
 #initialize he flask application
 app = Flask(__name__)
@@ -145,14 +153,48 @@ def set_budget_route():
         return redirect(url_for('index'))
     return render_template('set_budget.html')
 
+
+logging.basicConfig(level=logging.DEBUG) #setting up logging
+
 #creating route for report page
 @app.route('/report', methods = ['POST', 'GET'])
 @login_required
 def report():
-    if request.method == 'POST':
-        month = request.form['month']
-        report_data = generate_report(month) #generate_report() func returns list of transaction 
-        return render_template('report.html', report = report_data, month = month) #passing report data and month var to the report.html template
+    try:
+        if request.method == 'POST':
+            month = request.form['month']
+            report_data = generate_report(month) #generate_report() func returns list of transaction 
+            logging.debug(f'Report data: {report_data}')
+            
+            #aggregate expenses by category
+            expenses_by_category = defaultdict(lambda: 0.0) # {categories: total_amount_spent}
+            for entry in report_data:
+                if entry[3] == 'expense' or entry[3] == 'Expense':
+                    expenses_by_category[entry[1]] += float(entry[2])
+           
+            categories = list(expenses_by_category.keys())
+            amounts = list(expenses_by_category.values())
+            logging.debug(f'Categories: {categories}, Amounts: {amounts}')
+            
+            #Generate a pie chart of expenses by category         
+            fig, ax = plt.subplots()
+            ax.pie(amounts, labels=categories, autopct='%1.1f%%')
+            ax.axis('equal') #Equal aspect ratio ensures that pie is drawn as a circle.
+            
+            #Save it to a temporary buffer
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png')
+            buf.seek(0)
+            
+            #Embed the result in the html output
+            image = base64.b64encode(buf.getvalue()).decode('utf8')
+            
+            return render_template('report.html', report = report_data, month = month, image = image) #passing report data and month var to the report.html template
+        
+    except Exception as e:
+        logging.error(f"Error generating report: {e}")
+        return "An error occured while generating the report.", 500
+    
     return render_template('report.html', report=None)
 
 #creating route for check budget_status page
@@ -186,6 +228,7 @@ def ai_advice():
         return jsonify({"advice": advice}) #return the advice as a JSON response
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
 if __name__ == '__main__':
     app.run(debug=True)
     
