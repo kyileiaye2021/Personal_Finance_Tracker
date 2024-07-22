@@ -16,6 +16,7 @@ import io
 import base64
 import logging
 from collections import defaultdict
+from datetime import datetime
 import matplotlib
 
 matplotlib.use('Agg') #use the 'Agg' backend for non-GUI rendering
@@ -50,6 +51,16 @@ class User(db.Model, UserMixin): #User class inherits from db.Model and UserMixi
     username = db.Column(db.String(20), unique=True, nullable=False) #A string column with a maximum length of 20 chars, which must be unique and cannot be null (no two users can have the same username)
     email = db.Column(db.String(120), unique=True, nullable=False) #A string column with a maximum length of 120 chars, which must be unique and cannot have null val
     password = db.Column(db.String(60), nullable=False) 
+
+#define database for transaction so we have different transaction data for different users
+class Transaction(db.Model): # Transaction is a SQLAlchemy model that will be mapped to a database table 
+    id = db.Column(db.Integer, primary_key=True) #an integer column that serves as the primary key for the user table
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    category = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    transaction_type = db.Column(db.String(50), nullable = False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False) #link the user_id column in Transaction table to the id column in User table
+    user = db.relationship('User', backref=db.backref('transactions', lazy = True))
 
 #load user func to query the data from database by primary key
 #load user function - call back function to reload user object from the user ID stored in the session
@@ -140,12 +151,27 @@ def index():
 @login_required
 def add_transaction_route():
     if request.method == 'POST':
-        date = request.form['date']
-        category = request.form['category']
-        amount = float(request.form['amount'])
-        transaction_type = request.form['transaction_type']
-        add_transaction(date, category, amount, transaction_type)
-        return redirect(url_for('index'))
+        try:
+            date_str = request.form['date'] #this will get a str of date
+            category = request.form['category']
+            amount = float(request.form['amount'])
+            transaction_type = request.form['transaction_type']
+            user_id = current_user.id #this gets the id of currently logged-in user
+            
+            date = datetime.strptime(date_str, '%Y-%m-%d') # convert the date str to a datetime obj as the date in Transaction model only accepts date obj not str
+            
+            #create new transaction and add it to the database session of current user
+            new_transaction = Transaction(date = date, category = category, amount = amount, transaction_type = transaction_type, user_id = user_id)
+            db.session.add(new_transaction) 
+            db.session.commit()
+            
+            #add_transaction(date, category, amount, transaction_type) # no need anymore we are not storing the data in csv file anymore
+            return redirect(url_for('index'))
+        
+        except Exception as e:
+            logging.error(f'Error adding transaction: {e}')
+            return "An error occurred while adding the transaction.", 500
+        
     return render_template('add_transactions.html')
 
 #creating route for set_budget page
@@ -169,15 +195,23 @@ def report():
     try:
         if request.method == 'POST':
             month = request.form['month']
-            report_data = generate_report(month) #generate_report() func returns list of transaction 
-            logging.debug(f'Report data: {report_data}')
+            year, month = map(int, month.split('-'))
+            
+            transactions = Transaction.query.filter( #quries the Transaction model for transactions that match the specified month and year
+                db.extract('year', Transaction.date) == year, #extract the year component from Transaction date column
+                db.extract('month', Transaction.date) == month, #extract the month component from Transaction date column
+                Transaction.user_id == current_user.id #filter transactions by the currently logged-in user's ID
+            ).all()
+            
+            logging.debug(f'Transactions: {transactions}')
             
             #aggregate expenses by category
             expenses_by_category = defaultdict(lambda: 0.0) # {categories: total_amount_spent}
-            for entry in report_data:
-                if entry[3] == 'expense' or entry[3] == 'Expense':
-                    expenses_by_category[entry[1]] += float(entry[2]) #need to convert to float because the amount values are saved as 'str' in csv file
+            for transaction in transactions:
+                if transaction.transaction_type.lower() == 'expense':
+                    expenses_by_category[transaction.category] += float(transaction.amount) #need to convert to float because the amount values are saved as 'str' in csv file
            
+           #prepare data for visualization
             categories = list(expenses_by_category.keys())
             amounts = list(expenses_by_category.values())
             logging.debug(f'Categories: {categories}, Amounts: {amounts}')
@@ -195,7 +229,7 @@ def report():
             #Embed the result in the html output
             image = base64.b64encode(buf.getvalue()).decode('utf8') #encode the buffer's content in Base64 and convert it to a UTF-8 string
             
-            return render_template('report.html', report = report_data, month = month, image = image) #passing report data and month var to the report.html template
+            return render_template('report.html', report = transactions, year = year, month = month, image = image) #passing report data and month var to the report.html template
         
     except Exception as e:
         logging.error(f"Error generating report: {e}")

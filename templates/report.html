@@ -9,25 +9,47 @@
         <input type="text" name="month" id="month" required>
         <button type='submit'>Generate Report</button>
     </form>
+    
+    {% if report %}
+        <h2>Monthly Report for {{ year }}-{{ month }}</h2>
 
-    <!--display of report data-->
-    {% if report%} <!--check the report is empty or none -->
+        <!--display the pie chart-->
+        {% if image %}
+            <div><!--Display the pie chart-->
+                <h3>Expense by Category</h3>
+                <img src= "data:image/png;base64,{{ image }}" alt="Expenses by Category">
+            </div>
+        {% endif%}
 
-        <h2>Report for {{ month }}</h2>
+        <!--display the Transaction table-->
+        <h2>Transactions</h2>
+        {% if report %}
+        <table>
+            <thread> <!--header content in HTML table-->
+                <tr> <!--table row element (defines a row of cells in a table)-->
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                </tr>
+            </thread>
 
-       <div class= "image-container"><!--Display the pie chart-->
-        <h3>Expense by Category</h3>
-        <img src= "data:image/png;base64,{{ image }}" alt="Expenses by Category">
-       </div>
-        <ul>
+            <tbody> <!--body content in HTML table-->
+                {% for transaction in report %}
+                <tr>
+                    <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td> <!--convert datetime obj to str-->
+                    <td>{{ transaction.category }}</td>
+                    <td>{{ transaction.amount }}</td>
+                    <td>{{ transaction.transaction_type }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No transactions for the selected month</p>
+        {% endif %}
 
-            {% for transaction in report%} <!--iterates over each transaction in report list-->
-                <li>Date: {{ transaction[0] }}, Category: {{ transaction[1] }}, Amount: ${{ transaction[2] }}, Transaction_type: {{ transaction[3] }} </li> <!--For each transaction, create a list and display-->
-            {% endfor %} <!--end the for loop-->
-
-        </ul>
-
-    {% endif %} <!--end the if loop-->
+    {% endif %}
 </div>
 
 {% endblock %}
