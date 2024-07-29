@@ -3,27 +3,44 @@
 {% block content %}
 
 <div class='container'>
-    <h2>Budget Status</h2>
-
-    <form method="POST">
+    <h2>Check Budget </h2>
+    <form method="post">
         <label for='month'>Month (YYYY-MM):</label>
-        <input type='text' id='month' name='month' required>
-        <button type='submit'>Check Budget Status</button>
+        <input type="text" name="month" id="month" required>
+
+        <button type="submit">Submit</button>
     </form>
 
     {% if status %}
-        <h2> Budget Status for {{ month }}</h2>
-        <ul>
-            {% for item_category, data in status.items() %}
-                <li>Category: {{item_category}}, Status: {{data[0]}}, Spent: ${{data[1]}}, Budget: ${{data[2]}},  
-                    {% if data[0] == 'Under'%}
-                        Remaining ${{data[3]}} </li>
-                    {% endif %}
-                    {% if data[0] == 'Over' %}
-                        Amount Over ${{data[3]}} </li>
-                    {% endif %}
-            {% endfor %}
-        </ul>
+        {% if status %}
+            <h2>Budget Status for {{ month }}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Expense</th>
+                        <th>Budget</th>
+                        <th>Remaining</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category, info in status.items() %}
+                    <tr>
+                        <td>{{ category }}</td>
+                        <td>{{ info.Expense }}</td>
+                        <td>{{ info.Budget }}</td>
+                        <td>{{ info.Remaining }}
+                        <td>{{ info.Status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table> 
+        
+        {% else %}
+            <p>No budget data available for the selected month.</p>
+        {% endif %}
     {% endif %}
+    
 </div>
 {% endblock %}

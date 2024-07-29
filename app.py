@@ -62,6 +62,16 @@ class Transaction(db.Model): # Transaction is a SQLAlchemy model that will be ma
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False) #link the user_id column in Transaction table to the id column in User table
     user = db.relationship('User', backref=db.backref('transactions', lazy = True))
 
+#define database for budget so we have different budget data for different user accounts
+class Budget(db.Model): # Budget is a SQLAlchemy model that will be mapped to a database table
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    month = db.Column(db.Integer, nullable=False)
+    year = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) #link the user_id column in Budget table to the id column in User table
+    user = db.relationship('User', backref=db.backref('budgets', lazy=True))
+    
 #load user func to query the data from database by primary key
 #load user function - call back function to reload user object from the user ID stored in the session
 @login_manager.user_loader
@@ -181,7 +191,15 @@ def set_budget_route():
     if request.method == 'POST':
         category = request.form['category']
         amount = float(request.form['amount'])
-        set_budget(category, amount)
+        month = int(request.form['month'])
+        year = int(request.form['year'])
+        user_id = current_user.id 
+        
+        # create a new Budget entry and add it to Budget database
+        new_budget = Budget(category = category, amount = amount, month = month, year = year, user_id = user_id)
+        db.session.add(new_budget)
+        db.session.commit()
+        
         return redirect(url_for('index'))
     return render_template('set_budget.html')
 
@@ -243,10 +261,44 @@ def report():
 def check_budget_status_route():
     if request.method == 'POST':
         month = request.form['month']
-        budget_status = check_budget_status(month) #check_budget_status() func returns dict of {status, expense, budget, remaining/over}
-        return render_template('check_budget_status.html', status = budget_status, month = month)
-    return render_template('check_budget_status.html', status = None)
-  
+        year, month = map(int, month.split('-'))
+        
+        #Query the budgets for the current user and the specified month and year
+        budgets = Budget.query.filter_by(user_id=current_user.id, month=month, year=year)
+        
+        # Query the transactions for the current user and the specified month and year
+        transactions = Transaction.query.filter(
+            db.extract('year', Transaction.date) == year,
+            db.extract('month', Transaction.date) == month,
+            Transaction.user_id == current_user.id
+        ).all()
+
+        # Calculate expenses by category
+        expenses_by_category = defaultdict(lambda: 0.0)
+        for transaction in transactions:
+            if transaction.transaction_type.lower() == 'expense':
+                expenses_by_category[transaction.category] += float(transaction.amount)
+        
+        budget_status = {}
+        for budget in budgets:
+            category_expense = expenses_by_category[budget.category] #total amount the user used for specific categoy
+            remaining = budget.amount - category_expense # budget.amount refers to the budget amount that the user set
+            status = 'Under budget'
+            if remaining < 0:
+                status = 'Over budget'
+            elif remaining < budget.amount * 0.1: #Less than 10% remaining
+                status = 'Near budget limit'
+                
+            budget_status[budget.category] = {
+                'Expense': category_expense,
+                'Budget': budget.amount,
+                'Remaining': remaining,
+                'Status': status
+            }
+        return render_template('check_budget_status.html', status=budget_status, month=f'{year}-{month:02d}') 
+    
+    return render_template('check_budget_status.html', status=None)
+
 @app.route('/ai_advice', methods=['POST'])
 @login_required
 def ai_advice():
