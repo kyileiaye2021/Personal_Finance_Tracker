@@ -235,7 +235,8 @@ def report():
             expenses_by_category = defaultdict(lambda: 0.0) # {categories: total_amount_spent}
             for transaction in transactions:
                 if transaction.transaction_type.lower() == 'expense':
-                    expenses_by_category[transaction.category] += float(transaction.amount) #need to convert to float because the amount values are saved as 'str' in csv file
+                    category = transaction.category.lower() # Convert category names to lowercase
+                    expenses_by_category[category] += float(transaction.amount) #need to convert to float because the amount values are saved as 'str' in csv file
            
 
             categories = list(expenses_by_category.keys())
@@ -288,11 +289,13 @@ def check_budget_status_route():
         expenses_by_category = defaultdict(lambda: 0.0)
         for transaction in transactions:
             if transaction.transaction_type.lower() == 'expense':
-                expenses_by_category[transaction.category] += float(transaction.amount)
+                category = transaction.category.lower() # Convert category to lowercase
+                expenses_by_category[category] += float(transaction.amount)
         
         budget_status = {}
         for budget in budgets:
-            category_expense = expenses_by_category[budget.category] #total amount the user used for specific categoy
+            category = budget.category.lower()
+            category_expense = expenses_by_category[category] #total amount the user used for specific categoy
             remaining = budget.amount - category_expense # budget.amount refers to the budget amount that the user set
             status = 'Under budget'
             if remaining < 0:
@@ -300,12 +303,24 @@ def check_budget_status_route():
             elif remaining < budget.amount * 0.1: #Less than 10% remaining
                 status = 'Near budget limit'
                 
-            budget_status[budget.category] = {
+            budget_status[category] = {
                 'Expense': category_expense,
                 'Budget': budget.amount,
                 'Remaining': remaining,
                 'Status': status
             }
+            
+        # include categories where no budget is set but transaction exists
+        for category, amount in expenses_by_category.items():
+            if category not in budget_status:
+                budget_status[category] = {
+                    'Expense': amount,
+                    'Budget': 0,
+                    'Remaining': -amount,
+                    'Status': 'No budget set'
+                }
+                
+            
         return render_template('check_budget_status.html', status=budget_status, month=f'{year}-{month:02d}') 
     
     return render_template('check_budget_status.html', status=None)
