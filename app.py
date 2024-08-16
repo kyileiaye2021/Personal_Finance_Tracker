@@ -237,17 +237,6 @@ def report():
                 if transaction.transaction_type.lower() == 'expense':
                     expenses_by_category[transaction.category] += float(transaction.amount) #need to convert to float because the amount values are saved as 'str' in csv file
            
-           #prepare data for visualization
-
-            report_data = generate_report(month) #generate_report() func returns list of transaction 
-            logging.debug(f'Report data: {report_data}')
-            
-            #aggregate expenses by category
-            expenses_by_category = defaultdict(lambda: 0.0) # {categories: total_amount_spent}
-            for entry in report_data:
-                if entry[3] == 'expense' or entry[3] == 'Expense':
-                    expenses_by_category[entry[1]] += float(entry[2]) #need to convert to float because the amount values are saved as 'str' in csv file
-           
 
             categories = list(expenses_by_category.keys())
             amounts = list(expenses_by_category.values())
