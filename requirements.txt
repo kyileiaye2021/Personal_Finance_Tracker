@@ -15,6 +15,8 @@ Flask-Migrate==4.0.7
 Flask-SQLAlchemy==3.1.1
 Flask-WTF==1.2.1
 fonttools==4.53.1
+git-filter-repo==2.45.0
+gunicorn==23.0.0
 h11==0.14.0
 httpcore==1.0.5
 httpx==0.27.0
@@ -47,9 +49,4 @@ tqdm==4.66.4
 typing_extensions==4.12.2
 tzdata==2024.1
 Werkzeug==3.0.3
-Flask
-Flask-SQLAlchemy
-Flask-Login
-Flask-WTF
-WTForms
-email_validator
+WTForms==3.1.2
